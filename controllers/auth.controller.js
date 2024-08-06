@@ -1,6 +1,6 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { add_new_user, find_one_user } = require("../services/user.services");
+const { add_new_user, find_one_user, update_user } = require("../services/user.services");
 
 exports.signup = async (req, res) => {
   try {
@@ -35,6 +35,9 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ user_id: email_exists._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+    const update_token = await update_user(email_exists._id, {token})
+    if (!update_token) return res.status(400).json({ status: false, message: "Unable to login. Please try again later!" });
+
     return res.status(201).json({ status: true, token, message: "Logged in successfully" });
   } catch (error) {
     console.log("error===>",error);

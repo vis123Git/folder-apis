@@ -26,3 +26,12 @@ module.exports.find_user_by_id = async (id) => {
     throw error;
   }
 };
+
+module.exports.update_user = async (id, data) => {
+  try {
+    return await User.findByIdAndUpdate(id, { $set: data }, { new: true });
+  } catch (error) {
+    console.log("error--->", error);
+    throw error;
+  }
+};

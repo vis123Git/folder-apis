@@ -1,12 +1,10 @@
 const express = require('express');
 const { AuthenticateApi } = require('../middlewares/auth');
+const { create_folder, users_folders, delete_folder } = require('../controllers/folder.controller');
 const router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
-
 router.use(AuthenticateApi)
-
+router.post("/", create_folder)
+router.get("/", users_folders)
+router.delete("/:id", delete_folder)
 module.exports = router;
