@@ -10,14 +10,15 @@ exports.add_an_image = async (req, res) => {
     const folder_exists = await find_one_folder({ _id: folder_id, user_id: req.user_id }, {});
     if (!folder_exists) return res.status(400).json({ status: false, message: "Folder does not exists!" });
 
-    if(!req.file) return res.status(400).json({ status: false, message: "Please upload an image!" });
+    if (!req.file) return res.status(400).json({ status: false, message: "Please upload an image!" });
 
-    const add_file = await add_new_image({ name : req.file.filename, path: req.file.path,  folder_id, user_id: req.user_id });
+
+    const add_file = await add_new_image({ name: req.file.filename, original_name :  req.file.originalname, path: req.file.path, folder_id, user_id: req.user_id });
     if (!add_file) return res.status(400).json({ status: false, message: "Unable to upload image. Please try again later!" });
 
     return res.status(201).json({ status: true, message: "Image uploaded successfully" });
   } catch (error) {
-    console.log("error===>",error);
+    console.log("error===>", error);
     return res.status(400).json({ status: false, message: "Something went wrong!" });
   }
 };
@@ -25,14 +26,34 @@ exports.add_an_image = async (req, res) => {
 exports.users_images = async (req, res) => {
   try {
     const user_id = req.user_id;
-    const { query } = req.query;
+    const { name } = req.query;
 
-    const images_exists = await find_images({ user_id , name: { $regex: query, $options: 'i' },}, { user_id: 1, name: 1, folder_id: 1, path:1 });
+    const filter = { user_id}
+    if(name){
+      filter.original_name =  { $regex: name, $options: "i" }
+    }
+    const images_exists = await find_images(filter, { user_id: 1, name: 1, folder_id: 1, path: 1 ,original_name:1});
     if (!images_exists) return res.status(400).json({ status: false, message: "Unable to fetch your images!" });
 
     return res.status(200).json({ status: true, data: images_exists, message: "Images fetched successfully" });
   } catch (error) {
-    console.log("error===>",error);
+    console.log("error===>", error);
+    return res.status(400).json({ status: false, message: "Something went wrong!" });
+  }
+};
+
+exports.get_one_image = async (req, res) => {
+  try {
+    const user_id = req.user_id;
+    const { id } = req.params;
+    if (!isValidObjectId(id)) return res.status(400).json({ status: false, message: "Please provide image ID!" });
+
+    const image_exists = await find_one_image({ _id: id, user_id });
+    if (!image_exists) return res.status(400).json({ status: false, message: "Image does not exists!" });
+
+    return res.status(200).json({ status: true, data: image_exists, message: "Image found successfully" });
+  } catch (error) {
+    console.log("error===>", error);
     return res.status(400).json({ status: false, message: "Something went wrong!" });
   }
 };
@@ -51,7 +72,7 @@ exports.delete_image = async (req, res) => {
 
     return res.status(200).json({ status: true, message: "Image deleted successfully" });
   } catch (error) {
-    console.log("error===>",error);
+    console.log("error===>", error);
     return res.status(400).json({ status: false, message: "Something went wrong!" });
   }
 };

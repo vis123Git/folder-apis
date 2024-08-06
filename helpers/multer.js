@@ -21,17 +21,15 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   limits: { fileSize: 1000000 },
-  fileFilter,
+  fileFilter: function (req, file, cb) {
+    // Check the mimetype of the file against the valid mimetypes
+    if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg" || file.mimetype === "image/png" || file.mimetype === "image/gif") {
+      cb(null, true); // Accept the file
+    } else {
+      cb(new Error("Invalid file type")); // Reject the file
+    }
+  },
 });
-
-const fileFilter = function (req, file, cb) {
-  // Check the mimetype of the file against the valid mimetypes
-  if (file.mimetype === "image/jpeg" || file.mimetype === "image/jpg" || file.mimetype === "image/png" || file.mimetype === "image/gif") {
-    cb(null, true); // Accept the file
-  } else {
-    cb(new Error("Invalid file type")); // Reject the file
-  }
-};
 
 //********************************************************************************************************************************************************************* */
 
