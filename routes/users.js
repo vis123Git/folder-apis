@@ -1,9 +1,10 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const { AuthenticateApi } = require('../middlewares/auth');
+const { logout } = require('../controllers/user.controller');
+const router = express.Router();
+router.use(AuthenticateApi)
 
-/* GET users listing. */
-router.get('/', function(req, res, next) {
-  res.send('respond with a resource');
-});
+router.get("/logout", logout)
+
 
 module.exports = router;

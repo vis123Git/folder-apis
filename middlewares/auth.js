@@ -31,12 +31,9 @@ module.exports = {
       //FOR USER TOKEN AND VALIATION
       if (decoded_token.user_id) {
         const user = await find_user_by_id(decoded_token.user_id);
-        if (!user) {
-          return res.status(401).json({ status: false, message: "Token expired! Please login again." });
-        }
-        if (!user.token) {
-          return res.status(401).json({ status: false, message: "You are logged out! Please login again." });
-        }
+        if (!user) return res.status(401).json({ status: false, message: "Token expired! Please login again." });
+        if (!user.token) return res.status(401).json({ status: false, message: "You are logged out! Please login again." });
+        
         //FOR USER VERIFICATION
         req.user = user;
         req.user_id = user._id;
