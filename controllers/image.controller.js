@@ -35,6 +35,9 @@ exports.users_images = async (req, res) => {
     const images_exists = await find_images(filter, { user_id: 1, name: 1, folder_id: 1, path: 1 ,original_name:1});
     if (!images_exists) return res.status(400).json({ status: false, message: "Unable to fetch your images!" });
 
+    images_exists.forEach(img => {
+      img.name = `${process.env.BASE_URL}images/${img.name}`
+    });
     return res.status(200).json({ status: true, data: images_exists, message: "Images fetched successfully" });
   } catch (error) {
     console.log("error===>", error);
